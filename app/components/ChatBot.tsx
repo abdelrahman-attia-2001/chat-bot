@@ -8,6 +8,9 @@ import { FaUser } from "react-icons/fa";
 import { LuBot } from "react-icons/lu";
 import { AiOutlineClose } from "react-icons/ai";
 
+// ⚡️ TypeScript fix for SpeechRecognition
+
+
 export default function ChatBot() {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<{ role: string; content: string }[]>([]);
@@ -15,11 +18,23 @@ export default function ChatBot() {
   const [loading, setLoading] = useState(false);
   const [listening, setListening] = useState(false);
 
-  // ✅ SpeechRecognition بأمان باستخدام type assertion
+  // SpeechRecognition
   const SpeechRecognition =
     typeof window !== "undefined"
-      ? (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
+      ? window.SpeechRecognition || window.webkitSpeechRecognition
       : null;
+
+  // 🔑 Keywords for quick replies
+  const quickReplies = [
+    "What is this site?",
+    "Who made this site?",
+    "What can you do?",
+    "Explain AI",
+    "Tell me about yourself",
+    "الموقع دا عن ايه؟",
+    "مين عامل الموقع؟",
+    "ايه اللي بتعمله؟",
+  ];
 
   const sendMessage = async (message: string) => {
     if (!message.trim()) return;
@@ -29,6 +44,7 @@ export default function ChatBot() {
 
     const lowerMsg = message.toLowerCase();
 
+    // Respond locally to keywords
     const aboutPatterns = [
       "الموقع",
       "عن الموقع",
@@ -38,10 +54,8 @@ export default function ChatBot() {
       "صاحب الموقع",
       "مين عامل الموقع",
       "مين انت",
-      "مين اللى عامل الموقع",
-      "من صاحب الموقع",
-      "what is this site",
       "who made this site",
+      "what is this site",
       "about this site",
       "who are you",
       "what can you do",
@@ -52,15 +66,15 @@ export default function ChatBot() {
 
     if (aboutPatterns.some((p) => lowerMsg.includes(p))) {
       const reply =
-        lowerMsg.match(/[أ-ي]/)
+        /[أ-ي]/.test(message)
           ? "أنا مساعد ذكاء اصطناعي 🤖 تم تصميمي للإجابة على الأسئلة والتفاعل معك بطريقة ذكية وسلسة! الموقع دا خاص بتجربة الذكاء الاصطناعي التفاعلي ✨"
           : "I'm an AI assistant 🤖 designed to answer questions and interact with you intelligently! This website is a smart AI experience ✨";
-
       setMessages((prev) => [...prev, { role: "assistant", content: reply }]);
       setLoading(false);
       return;
     }
 
+    // Fallback: call your API
     try {
       const res = await fetch("/api/chat", {
         method: "POST",
@@ -80,15 +94,15 @@ export default function ChatBot() {
     }
   };
 
-  // 🎙️ وظيفة التعرف على الصوت
+  // 🎙️ Voice recognition
   const startListening = () => {
     if (!SpeechRecognition) {
-      alert("المتصفح بتاعك مش بيدعم التعرف على الصوت.");
+      alert("Your browser doesn't support voice recognition.");
       return;
     }
 
     const recog = new SpeechRecognition();
-    recog.lang = "ar-EG,en-US";
+    recog.lang = "ar-EG,en-US"; // Arabic + English
     recog.interimResults = false;
 
     recog.onstart = () => setListening(true);
@@ -107,7 +121,7 @@ export default function ChatBot() {
     sendMessage(input);
   };
 
-  // 🔤 Typing animation للردود
+  // Typing animation
   const [displayedText, setDisplayedText] = useState("");
   useEffect(() => {
     const last = messages[messages.length - 1];
@@ -122,15 +136,9 @@ export default function ChatBot() {
     }
   }, [messages]);
 
-  const suggestedPrompts = [
-    "الموقع دا عن ايه؟",
-    "مين عامل الموقع؟",
-    "What can you do?",
-    "Explain artificial intelligence",
-  ];
-
   return (
     <div className="mt-60">
+      {/* Open button */}
       {!isOpen && (
         <motion.button
           onClick={() => setIsOpen(true)}
@@ -156,27 +164,25 @@ export default function ChatBot() {
               AI Assistant
             </div>
 
+            {/* Quick replies */}
+            <div className="flex flex-wrap gap-2 p-2 border-b border-gray-700">
+              {quickReplies.map((q, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => sendMessage(q)}
+                  className="bg-gray-700 hover:bg-gray-600 text-white px-3 py-1 rounded-full text-sm"
+                >
+                  {q}
+                </button>
+              ))}
+            </div>
+
             {/* Chat messages */}
             <div className="flex-1 overflow-y-auto p-4 space-y-3">
               {messages.length === 0 ? (
-                <div className="text-center text-gray-400 space-y-4">
-                  <div>
-                    <p className="text-lg font-medium">💬 Welcome!</p>
-                    <p className="text-sm">Speak or type in Arabic or English.</p>
-                  </div>
-                  <div className="flex flex-wrap justify-center gap-2 mt-4">
-                    {suggestedPrompts.map((prompt, i) => (
-                      <motion.button
-                        key={i}
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        onClick={() => sendMessage(prompt)}
-                        className="text-sm px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg hover:bg-zinc-700 transition"
-                      >
-                        {prompt}
-                      </motion.button>
-                    ))}
-                  </div>
+                <div className="text-center text-gray-400 space-y-2">
+                  <p className="text-lg font-medium">💬 Welcome!</p>
+                  <p className="text-sm">Speak or type in Arabic or English.</p>
                 </div>
               ) : (
                 messages.map((msg, i) => (
@@ -230,6 +236,7 @@ export default function ChatBot() {
                 disabled={loading}
               />
 
+              {/* Mic with animated sound waves */}
               <button type="button" onClick={startListening} className="p-3 relative">
                 <IoMdMic
                   size={22}
@@ -265,6 +272,7 @@ export default function ChatBot() {
               </button>
             </form>
 
+            {/* Close button */}
             <button
               onClick={() => setIsOpen(false)}
               className="absolute top-3 right-3 text-gray-400 hover:text-white transition"
