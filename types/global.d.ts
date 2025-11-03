@@ -1,10 +1,9 @@
-/// <reference types="typescript" />
-
-export {};
-
-declare global {
-  interface Window {
-    SpeechRecognition: typeof SpeechRecognition;
-    webkitSpeechRecognition: typeof SpeechRecognition;
-  }
+interface Window {
+  SpeechRecognition: typeof SpeechRecognition;
+  webkitSpeechRecognition: typeof SpeechRecognition;
 }
+
+declare var SpeechRecognition: {
+  prototype: SpeechRecognition;
+  new (): SpeechRecognition;
+};
