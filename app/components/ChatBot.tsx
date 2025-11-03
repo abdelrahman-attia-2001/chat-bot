@@ -33,7 +33,7 @@ export default function ChatBot() {
       "الموقع",
       "عن الموقع",
       "who made this site",
-      "what is this site"
+      "what is this site",
     ];
 
     if (aboutPatterns.some((p) => lowerMsg.includes(p))) {
@@ -49,7 +49,7 @@ export default function ChatBot() {
     setTimeout(() => {
       setMessages((prev) => [
         ...prev,
-        { role: "assistant", content: "This is a dummy AI reply." }
+        { role: "assistant", content: "This is a dummy AI reply." },
       ]);
       setLoading(false);
     }, 1000);
@@ -129,7 +129,9 @@ export default function ChatBot() {
                 messages.map((msg, i) => (
                   <div
                     key={i}
-                    className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
+                    className={`flex ${
+                      msg.role === "user" ? "justify-end" : "justify-start"
+                    }`}
                   >
                     {msg.role === "assistant" && (
                       <LuBot className="text-cyan-400 mt-1 mr-2" size={22} />
@@ -152,7 +154,11 @@ export default function ChatBot() {
                 ))
               )}
 
-              {loading && <div className="text-center text-gray-400 animate-pulse">Thinking...</div>}
+              {loading && (
+                <div className="text-center text-gray-400 animate-pulse">
+                  Thinking...
+                </div>
+              )}
             </div>
 
             {/* Input */}
@@ -170,16 +176,30 @@ export default function ChatBot() {
               />
 
               {/* Mic button */}
-              <button type="button" onClick={startListening} className="p-3 relative">
-                <IoMdMic size={22} className={`${listening ? "text-red-500" : "text-cyan-400"}`} />
+              <button
+                type="button"
+                onClick={startListening}
+                className="p-3 relative"
+              >
+                <IoMdMic
+                  size={22}
+                  className={`${listening ? "text-red-500" : "text-cyan-400"}`}
+                />
                 {listening && (
                   <div className="absolute inset-0 flex items-center justify-center gap-[2px]">
                     {[...Array(4)].map((_, i) => (
                       <motion.span
                         key={i}
                         className="w-[3px] h-[10px] bg-red-500 rounded-sm"
-                        animate={{ height: ["8px", "18px", "8px"], opacity: [0.7, 1, 0.7] }}
-                        transition={{ duration: 0.5, repeat: Infinity, delay: i * 0.15 }}
+                        animate={{
+                          height: ["8px", "18px", "8px"],
+                          opacity: [0.7, 1, 0.7],
+                        }}
+                        transition={{
+                          duration: 0.5,
+                          repeat: Infinity,
+                          delay: i * 0.15,
+                        }}
                       />
                     ))}
                   </div>
