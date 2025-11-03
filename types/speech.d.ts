@@ -1,13 +1,15 @@
-// types/speech.d.ts
-declare global {
-  interface SpeechRecognitionEvent extends Event {
-    readonly results: SpeechRecognitionResultList;
-  }
+// types/global.d.ts
 
-  interface Window {
-    SpeechRecognition?: any; // type-safe ممكن تحط typeof window.SpeechRecognition بعد ما تتحقق
-    webkitSpeechRecognition?: any;
-  }
+// توسيع واجهة Window لإضافة خصائص التعرف على الكلام
+interface Window {
+  // الواجهة القياسية (إذا كانت مدعومة)
+  SpeechRecognition: typeof SpeechRecognition;
+  // الواجهة المخصصة للمتصفحات التي تستخدم بادئة (مثل Chrome/Safari)
+  webkitSpeechRecognition: typeof SpeechRecognition;
 }
 
-export {};
+// تعريف دالة البناء (Constructor) للتعرف على الكلام
+declare var SpeechRecognition: {
+  prototype: SpeechRecognition;
+  new (): SpeechRecognition;
+};
