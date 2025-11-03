@@ -15,7 +15,6 @@ export default function ChatBot() {
   const [loading, setLoading] = useState(false);
   const [listening, setListening] = useState(false);
 
-  // 🧠 Speech Recognition (Arabic + English)
   const SpeechRecognition =
     typeof window !== "undefined"
       ? window.SpeechRecognition || window.webkitSpeechRecognition
@@ -28,20 +27,34 @@ export default function ChatBot() {
     setLoading(true);
 
     const lowerMsg = message.toLowerCase();
+
+    // 🔑 Expanded keywords
     const aboutPatterns = [
+      "الموقع",
+      "عن الموقع",
+      "الويب سايت",
+      "الموقع دا عن ايه",
+      "بتاع ايه",
+      "صاحب الموقع",
+      "مين عامل الموقع",
+      "مين انت",
+      "مين اللى عامل الموقع",
+      "من صاحب الموقع",
       "what is this site",
       "who made this site",
       "about this site",
-      "من صاحب الموقع",
-      "مين عامل الموقع",
-      "الموقع دا عن ايه",
+      "who are you",
+      "what can you do",
+      "what is ai",
+      "explain ai",
+      "tell me about yourself",
     ];
 
     if (aboutPatterns.some((p) => lowerMsg.includes(p))) {
       const reply =
         lowerMsg.match(/[أ-ي]/) !== null
-          ? "الموقع دا عبارة عن مساعد ذكاء اصطناعي تم تصميمه لتجربة محادثة ذكية وسلسة ✨"
-          : "This website is an AI assistant built to provide a smooth and smart chat experience ✨";
+          ? "أنا مساعد ذكاء اصطناعي 🤖 تم تصميمي للإجابة على الأسئلة والتفاعل معك بطريقة ذكية وسلسة! الموقع دا خاص بتجربة الذكاء الاصطناعي التفاعلي ✨"
+          : "I'm an AI assistant 🤖 designed to answer questions and interact with you intelligently! This website is a smart AI experience ✨";
       setMessages((prev) => [...prev, { role: "assistant", content: reply }]);
       setLoading(false);
       return;
@@ -66,7 +79,7 @@ export default function ChatBot() {
     }
   };
 
-  // 🎙️ Dual-language voice recognition (Arabic + English)
+  // 🎙️ Voice recognition for Arabic + English
   const startListening = () => {
     if (!SpeechRecognition) {
       alert("Your browser doesn't support voice recognition.");
@@ -74,7 +87,7 @@ export default function ChatBot() {
     }
 
     const recog = new SpeechRecognition();
-    recog.lang = "ar-EG,en-US"; // يدعم العربي والانجليزي
+    recog.lang = "ar-EG,en-US";
     recog.interimResults = false;
 
     recog.onstart = () => setListening(true);
@@ -93,7 +106,7 @@ export default function ChatBot() {
     sendMessage(input);
   };
 
-  // 🪄 Typing animation for AI replies
+  // Typing animation for AI replies
   const [displayedText, setDisplayedText] = useState("");
   useEffect(() => {
     const last = messages[messages.length - 1];
@@ -108,6 +121,14 @@ export default function ChatBot() {
     }
   }, [messages]);
 
+  // 🧠 Suggested prompts
+  const suggestedPrompts = [
+    "الموقع دا عن ايه؟",
+    "مين عامل الموقع؟",
+    "What can you do?",
+    "Explain artificial intelligence",
+  ];
+
   return (
     <div className="mt-60">
       {!isOpen && (
@@ -115,7 +136,7 @@ export default function ChatBot() {
           onClick={() => setIsOpen(true)}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          className="fixed bottom-1/2 right-1/2 translate-x-1/2 translate-y-1/2 bg-gradient-to-r from-blue-600 to-cyan-500 text-white px-6 py-3 rounded-full shadow-lg font-semibold text-lg z-50"
+          className="fixed bottom-1/2 right-1/2 translate-x-1/2 translate-y-1/2 bg-gradient-to-r from-blue-600 to-cyan-500 text-white px-8 py-4 rounded-full shadow-xl font-semibold text-lg z-50"
         >
           Chat with AI 🤖
         </motion.button>
@@ -127,7 +148,7 @@ export default function ChatBot() {
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.9 }}
-            className="fixed bottom-6 right-6 w-[380px] h-[520px] bg-[#111] text-white rounded-2xl shadow-2xl flex flex-col border border-gray-700 overflow-hidden z-50"
+            className="fixed bottom-6 right-6 w-[380px] h-[520px] bg-[#0b0f19] text-white rounded-2xl shadow-2xl flex flex-col border border-gray-700 overflow-hidden z-50"
           >
             {/* Header */}
             <div className="bg-gradient-to-r from-blue-600 to-cyan-500 p-3 text-center font-semibold text-xl flex items-center justify-center gap-2">
@@ -138,9 +159,26 @@ export default function ChatBot() {
             {/* Chat messages */}
             <div className="flex-1 overflow-y-auto p-4 space-y-3">
               {messages.length === 0 ? (
-                <div className="text-center text-gray-400 space-y-2">
-                  <p className="text-lg font-medium">💬 Welcome!</p>
-                  <p className="text-sm">Ask me anything in Arabic or English.</p>
+                <div className="text-center text-gray-400 space-y-4">
+                  <div>
+                    <p className="text-lg font-medium">💬 Welcome!</p>
+                    <p className="text-sm">Speak or type in Arabic or English.</p>
+                  </div>
+
+                  {/* 💡 Suggested prompts */}
+                  <div className="flex flex-wrap justify-center gap-2 mt-4">
+                    {suggestedPrompts.map((prompt, i) => (
+                      <motion.button
+                        key={i}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={() => sendMessage(prompt)}
+                        className="text-sm px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg hover:bg-zinc-700 transition"
+                      >
+                        {prompt}
+                      </motion.button>
+                    ))}
+                  </div>
                 </div>
               ) : (
                 messages.map((msg, i) => (
@@ -194,22 +232,31 @@ export default function ChatBot() {
                 disabled={loading}
               />
 
-              {/* Mic button with animation */}
+              {/* 🎙️ Mic with animated sound waves */}
               <button type="button" onClick={startListening} className="p-3 relative">
                 <IoMdMic
                   size={22}
-                  className={`transition ${
-                    listening ? "text-red-500" : "text-cyan-400"
-                  }`}
+                  className={`transition ${listening ? "text-red-500" : "text-cyan-400"}`}
                 />
+
                 {listening && (
-                  <motion.span
-                    className="absolute inset-0 flex items-center justify-center"
-                    animate={{ scale: [1, 1.4, 1], opacity: [0.6, 0.3, 0.6] }}
-                    transition={{ duration: 1, repeat: Infinity }}
-                  >
-                    <span className="w-5 h-5 rounded-full bg-red-500 opacity-40"></span>
-                  </motion.span>
+                  <div className="absolute inset-0 flex items-center justify-center gap-[2px]">
+                    {[...Array(4)].map((_, i) => (
+                      <motion.span
+                        key={i}
+                        className="w-[3px] h-[10px] bg-red-500 rounded-sm"
+                        animate={{
+                          height: ["8px", "18px", "8px"],
+                          opacity: [0.7, 1, 0.7],
+                        }}
+                        transition={{
+                          duration: 0.5,
+                          repeat: Infinity,
+                          delay: i * 0.15,
+                        }}
+                      />
+                    ))}
+                  </div>
                 )}
               </button>
 
