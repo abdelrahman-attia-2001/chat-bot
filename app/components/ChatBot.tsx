@@ -15,10 +15,10 @@ export default function ChatBot() {
   const [loading, setLoading] = useState(false);
   const [listening, setListening] = useState(false);
 
-  // ✅ تعريف SpeechRecognition بأمان
-  const SpeechRecognition: typeof window.SpeechRecognition | null =
+  // ✅ SpeechRecognition بأمان باستخدام type assertion
+  const SpeechRecognition =
     typeof window !== "undefined"
-      ? window.SpeechRecognition || window.webkitSpeechRecognition
+      ? (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
       : null;
 
   const sendMessage = async (message: string) => {
@@ -52,9 +52,10 @@ export default function ChatBot() {
 
     if (aboutPatterns.some((p) => lowerMsg.includes(p))) {
       const reply =
-        lowerMsg.match(/[أ-ي]/) !== null
+        lowerMsg.match(/[أ-ي]/)
           ? "أنا مساعد ذكاء اصطناعي 🤖 تم تصميمي للإجابة على الأسئلة والتفاعل معك بطريقة ذكية وسلسة! الموقع دا خاص بتجربة الذكاء الاصطناعي التفاعلي ✨"
           : "I'm an AI assistant 🤖 designed to answer questions and interact with you intelligently! This website is a smart AI experience ✨";
+
       setMessages((prev) => [...prev, { role: "assistant", content: reply }]);
       setLoading(false);
       return;
@@ -79,7 +80,7 @@ export default function ChatBot() {
     }
   };
 
-  // 🎙️ ميزة التعرف على الصوت
+  // 🎙️ وظيفة التعرف على الصوت
   const startListening = () => {
     if (!SpeechRecognition) {
       alert("المتصفح بتاعك مش بيدعم التعرف على الصوت.");
