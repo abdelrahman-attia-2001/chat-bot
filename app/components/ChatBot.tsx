@@ -10,17 +10,10 @@ import { AiOutlineClose } from "react-icons/ai";
 
 export default function ChatBot() {
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState<{ role: string; content: string }[]>(
-    []
-  );
+  const [messages, setMessages] = useState<{ role: string; content: string }[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [listening, setListening] = useState(false);
-
-  const SpeechRecognition =
-    typeof window !== "undefined"
-      ? window.SpeechRecognition || window.webkitSpeechRecognition
-      : null;
 
   const sendMessage = async (message: string) => {
     if (!message.trim()) return;
@@ -45,7 +38,7 @@ export default function ChatBot() {
       return;
     }
 
-    // رد تجريبي مؤقت (يمكنك استبداله بـ API call)
+    // رد تجريبي مؤقت
     setTimeout(() => {
       setMessages((prev) => [
         ...prev,
@@ -56,8 +49,14 @@ export default function ChatBot() {
   };
 
   const startListening = () => {
+    if (typeof window === "undefined") return;
+
+    const SpeechRecognition =
+      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+
     if (!SpeechRecognition) {
-      return alert("Your browser doesn't support voice recognition.");
+      alert("Your browser doesn't support voice recognition.");
+      return;
     }
 
     const recog = new SpeechRecognition();
@@ -129,9 +128,7 @@ export default function ChatBot() {
                 messages.map((msg, i) => (
                   <div
                     key={i}
-                    className={`flex ${
-                      msg.role === "user" ? "justify-end" : "justify-start"
-                    }`}
+                    className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
                   >
                     {msg.role === "assistant" && (
                       <LuBot className="text-cyan-400 mt-1 mr-2" size={22} />
@@ -176,11 +173,7 @@ export default function ChatBot() {
               />
 
               {/* Mic button */}
-              <button
-                type="button"
-                onClick={startListening}
-                className="p-3 relative"
-              >
+              <button type="button" onClick={startListening} className="p-3 relative">
                 <IoMdMic
                   size={22}
                   className={`${listening ? "text-red-500" : "text-cyan-400"}`}
