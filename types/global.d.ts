@@ -2,7 +2,18 @@ export {};
 
 declare global {
   interface Window {
-    SpeechRecognition: typeof SpeechRecognition;
-    webkitSpeechRecognition: typeof SpeechRecognition;
+    SpeechRecognition: any;
+    webkitSpeechRecognition: any;
+  }
+
+  interface SpeechRecognitionEvent extends Event {
+    results: {
+      [index: number]: {
+        0: {
+          transcript: string;
+        };
+      };
+      length: number;
+    };
   }
 }

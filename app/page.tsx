@@ -26,7 +26,7 @@ export default function Home() {
         Just click the button below to start chatting!
       </motion.p>
 
-      <ChatBot  />
+      <ChatBot />
     </div>
   );
 }
