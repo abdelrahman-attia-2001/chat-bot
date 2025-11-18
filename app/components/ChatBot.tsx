@@ -7,6 +7,7 @@ import { IoMdMic } from "react-icons/io";
 import { FaUser } from "react-icons/fa";
 import { LuBot } from "react-icons/lu";
 import { AiOutlineClose } from "react-icons/ai";
+import { BiMessageRoundedDots } from "react-icons/bi";
 
 type ChatMessage = {
   role: "user" | "assistant";
@@ -107,13 +108,11 @@ export default function ChatBot() {
 
     const trimmedMessage = message.trim();
 
-    // أضف رسالة المستخدم
     setMessages((prev) => [...prev, { role: "user", content: trimmedMessage }]);
     setInput("");
     setLoading(true);
 
     try {
-      // 1) جرّب الأول الردود الجاهزة
       const quickReply = findQuickReply(trimmedMessage);
       if (quickReply) {
         setMessages((prev) => [
@@ -124,7 +123,6 @@ export default function ChatBot() {
         return;
       }
 
-      // 2) ننده على API بتاعنا في Next.js
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: {
@@ -140,7 +138,7 @@ export default function ChatBot() {
       const data = await res.json();
       const reply: string =
         data.reply ??
-        "واجهت مشكلة بسيطة في فهم سؤالك، حاول إعادة صياغته من فضلك 😊";
+        "واجهت مشكلة بسيطة في فهم سؤالك، حاول إعادة صياغته من فضلك";
 
       setMessages((prev) => [
         ...prev,
@@ -153,7 +151,7 @@ export default function ChatBot() {
         {
           role: "assistant",
           content:
-            "حدث خطأ أثناء الاتصال بالمساعد الذكي. حاول مرة أخرى لاحقًا 🙏",
+            "حدث خطأ أثناء الاتصال بالمساعد الذكي. حاول مرة أخرى لاحقًا",
         },
       ]);
     } finally {
@@ -222,11 +220,12 @@ export default function ChatBot() {
       {!isOpen && (
         <motion.button
           onClick={() => setIsOpen(true)}
-          className="fixed bottom-6 right-6 bg-gradient-to-r from-blue-600 to-cyan-500 text-white px-6 py-3 rounded-full shadow-xl font-semibold text-base z-50 flex items-center gap-2"
+          className="fixed bottom-8 right-8 bg-gradient-to-r from-emerald-600 to-teal-600 text-white px-7 py-4 rounded-2xl shadow-2xl font-bold text-base z-50 flex items-center gap-3 hover:shadow-emerald-500/30 transition-all duration-300"
           whileTap={{ scale: 0.95 }}
           whileHover={{ scale: 1.05 }}
         >
-          تحدث مع المساعد 🤖
+          <BiMessageRoundedDots size={24} />
+          <span>تحدث مع المساعد</span>
         </motion.button>
       )}
 
@@ -234,43 +233,48 @@ export default function ChatBot() {
         {isOpen && (
           <motion.div
             dir="rtl"
-            initial={{ opacity: 0, scale: 0.92 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.92 }}
-            transition={{ duration: 0.2 }}
-            className="fixed bottom-6 right-6 w-[360px] h-[520px] bg-[#0b0f19] text-white rounded-2xl shadow-2xl flex flex-col border border-gray-700 overflow-hidden z-50"
+            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.9, y: 20 }}
+            transition={{ duration: 0.3, ease: "easeOut" }}
+            className="fixed bottom-8 right-8 w-[420px] h-[600px] bg-[#0a0a0a] text-white rounded-3xl shadow-2xl flex flex-col border border-zinc-800 overflow-hidden z-50"
           >
             <button
               onClick={() => setIsOpen(false)}
-              className="absolute top-3 left-3 text-gray-300 hover:text-white transition"
+              className="absolute top-4 left-4 text-zinc-500 hover:text-white hover:bg-zinc-800 p-2 rounded-full transition-all duration-200 z-10"
               aria-label="إغلاق الدردشة"
             >
-              <AiOutlineClose size={22} />
+              <AiOutlineClose size={20} />
             </button>
 
-            <div className="bg-gradient-to-r from-blue-600 to-cyan-500 p-3 text-center font-semibold text-lg flex items-center justify-center gap-2">
-              <LuBot size={22} />
-              مساعد تدوير الذكي
+            <div className="bg-gradient-to-r from-emerald-600 to-teal-600 p-5 flex items-center justify-center gap-3">
+              <LuBot size={28} />
+              <span className="font-bold text-xl">مساعد تدوير الذكي</span>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-4 space-y-4">
+            <div className="flex-1 overflow-y-auto p-5 space-y-5 bg-[#0f0f0f]">
               {messages.length === 0 && (
-                <div className="text-center text-gray-300 space-y-3">
-                  <p className="text-lg font-semibold">
-                    أهلاً بك في مساعد تدوير الذكي! 👋
+                <div className="text-center text-zinc-400 space-y-5 mt-8">
+                  <div className="inline-flex items-center justify-center w-20 h-20 bg-zinc-900 rounded-full border-2 border-emerald-500/30 mb-2">
+                    <LuBot size={40} className="text-emerald-500" />
+                  </div>
+                  <p className="text-xl font-bold text-white">
+                    أهلاً بك في مساعد تدوير الذكي
                   </p>
-                  <p className="text-sm">
-                    يمكنك طرح سؤالك مباشرة أو اختيار أحد الأسئلة الشائعة أدناه.
+                  <p className="text-sm text-zinc-500 px-4">
+                    يمكنك طرح سؤالك مباشرة أو اختيار أحد الأسئلة الشائعة أدناه
                   </p>
-                  <div className="flex flex-wrap gap-2 justify-center">
+                  <div className="flex flex-wrap gap-2 justify-center px-3">
                     {quickReplies.map((item) => (
-                      <button
+                      <motion.button
                         key={item.prompt}
                         onClick={() => handleQuickReply(item.prompt)}
-                        className="px-3 py-2 text-sm bg-zinc-800 text-zinc-100 rounded-full border border-cyan-500 hover:bg-cyan-600 hover:text-white transition"
+                        className="px-4 py-2.5 text-sm bg-zinc-900 text-zinc-300 rounded-xl border border-zinc-800 hover:bg-zinc-800 hover:border-emerald-500/50 hover:text-white transition-all duration-200"
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
                       >
                         {item.prompt}
-                      </button>
+                      </motion.button>
                     ))}
                   </div>
                 </div>
@@ -282,23 +286,25 @@ export default function ChatBot() {
                   msg.role === "assistant" && index === messages.length - 1;
 
                 return (
-                  <div
+                  <motion.div
                     key={`${msg.role}-${index}`}
-                    className={`flex ${
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3 }}
+                    className={`flex gap-3 ${
                       isUser ? "justify-start" : "justify-end"
                     }`}
                   >
                     {isUser && (
-                      <FaUser
-                        className="text-gray-400 ml-2 mt-1 flex-shrink-0"
-                        size={20}
-                      />
+                      <div className="flex-shrink-0 w-9 h-9 rounded-full bg-gradient-to-br from-blue-600 to-blue-500 flex items-center justify-center">
+                        <FaUser size={16} />
+                      </div>
                     )}
                     <div
-                      className={`px-3 py-2 rounded-lg max-w-[75%] text-sm leading-relaxed ${
+                      className={`px-5 py-3 rounded-2xl max-w-[75%] text-sm leading-relaxed ${
                         isUser
-                          ? "bg-gradient-to-r from-blue-600 to-cyan-500 text-white"
-                          : "bg-zinc-800 text-zinc-200 border border-zinc-700"
+                          ? "bg-blue-600 text-white rounded-tr-sm"
+                          : "bg-zinc-900 text-zinc-200 border border-zinc-800 rounded-tl-sm"
                       }`}
                     >
                       {isLastAssistant
@@ -306,44 +312,58 @@ export default function ChatBot() {
                         : msg.content}
                     </div>
                     {!isUser && (
-                      <LuBot
-                        className="text-cyan-400 mr-2 mt-1 flex-shrink-0"
-                        size={20}
-                      />
+                      <div className="flex-shrink-0 w-9 h-9 rounded-full bg-gradient-to-br from-emerald-600 to-teal-600 flex items-center justify-center">
+                        <LuBot size={18} />
+                      </div>
                     )}
-                  </div>
+                  </motion.div>
                 );
               })}
 
               {loading && (
-                <div className="text-center text-gray-400 animate-pulse text-sm">
-                  لحظات أفكر في رد مناسب...
+                <div className="flex justify-center items-center gap-2">
+                  <motion.div
+                    className="w-2 h-2 bg-emerald-500 rounded-full"
+                    animate={{ scale: [1, 1.5, 1], opacity: [0.5, 1, 0.5] }}
+                    transition={{ duration: 1, repeat: Infinity, delay: 0 }}
+                  />
+                  <motion.div
+                    className="w-2 h-2 bg-emerald-500 rounded-full"
+                    animate={{ scale: [1, 1.5, 1], opacity: [0.5, 1, 0.5] }}
+                    transition={{ duration: 1, repeat: Infinity, delay: 0.2 }}
+                  />
+                  <motion.div
+                    className="w-2 h-2 bg-emerald-500 rounded-full"
+                    animate={{ scale: [1, 1.5, 1], opacity: [0.5, 1, 0.5] }}
+                    transition={{ duration: 1, repeat: Infinity, delay: 0.4 }}
+                  />
                 </div>
               )}
             </div>
 
             <form
               onSubmit={handleSubmit}
-              className="flex items-center border-t border-gray-700 bg-zinc-900"
+              className="flex items-center border-t border-zinc-800 bg-[#0a0a0a] p-3 gap-2"
             >
-              <button
+              <motion.button
                 type="button"
                 onClick={startListening}
-                className="p-3 relative"
+                className="p-3 rounded-xl hover:bg-zinc-900 transition-all duration-200 relative"
                 aria-label="تسجيل صوتي"
+                whileTap={{ scale: 0.9 }}
               >
                 <IoMdMic
-                  size={22}
-                  className={listening ? "text-red-500" : "text-cyan-400"}
+                  size={24}
+                  className={listening ? "text-red-500" : "text-emerald-500"}
                 />
                 {listening && (
                   <div className="absolute inset-0 flex items-center justify-center gap-[2px]">
                     {[...Array(4)].map((_, i) => (
                       <motion.span
                         key={`mic-${i}`}
-                        className="w-[3px] h-[10px] bg-red-500 rounded-sm"
+                        className="w-[3px] h-[12px] bg-red-500 rounded-full"
                         animate={{
-                          height: ["8px", "18px", "8px"],
+                          height: ["8px", "20px", "8px"],
                           opacity: [0.7, 1, 0.7],
                         }}
                         transition={{
@@ -355,25 +375,26 @@ export default function ChatBot() {
                     ))}
                   </div>
                 )}
-              </button>
+              </motion.button>
 
               <input
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder="اكتب رسالتك هنا..."
-                className="flex-1 bg-transparent outline-none p-3 text-white text-right placeholder:text-gray-500"
+                className="flex-1 bg-zinc-900 outline-none px-4 py-3 text-white text-right placeholder:text-zinc-600 rounded-xl border border-zinc-800 focus:border-emerald-500/50 transition-all duration-200"
                 disabled={loading}
               />
 
-              <button
+              <motion.button
                 type="submit"
                 disabled={!input.trim()}
-                className="p-3 text-white bg-cyan-600 hover:bg-cyan-700 transition disabled:opacity-40 disabled:cursor-not-allowed"
+                className="p-3 text-white bg-emerald-600 hover:bg-emerald-700 transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed rounded-xl"
                 aria-label="إرسال الرسالة"
+                whileTap={{ scale: 0.9 }}
               >
-                <FiSend size={18} />
-              </button>
+                <FiSend size={20} />
+              </motion.button>
             </form>
           </motion.div>
         )}
